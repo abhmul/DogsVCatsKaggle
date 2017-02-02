@@ -9,7 +9,7 @@ Xtr, ytr = dogsvcats.load_train('../input/train/', (64, 64), grayscale=True)
 Xtr = Xtr.reshape(Xtr.shape[0], -1)
 
 model = Sequential()
-### TODO Replace this code here with a ConvNet architecture ###
+# TODO Replace this code here with a ConvNet architecture
 model.add(Dense(200, activation='relu', input_dim=Xtr.shape[1]))
 model.add(Dense(200, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
