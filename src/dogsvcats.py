@@ -102,13 +102,20 @@ def load_test(test_dir='../input/test/', img_size=(64, 64), grayscale=False):
 
 
 def create_submission(predictions, info=''):
-    ids = np.arange(1, predictions.shape[0]+1).reshape(1, -1)
-    morphed_preds = predictions.reshape(predictions.shape[0], -1)
-    pred_vals = np.hstack((ids, morphed_preds))
-    result1 = pd.DataFrame(pred_vals, columns=['id', 'label'])
+    """
+    Creates a submission for kaggle and saves it in the current directory
+    :param predictions: The numpy array of predictions output by the NN
+    :param info: An optional parameter to add info to submission filename
+    """
+    # Turn the predictions into a dataframe
+    result1 = pd.DataFrame(predictions, columns=['label'])
+    # Kaggle wants the id numbers to start from 1
+    result1.index += 1
+    # Get the time of submission creation
     now = datetime.datetime.now()
     sub_file = 'submission_' + info + '_' + str(now.strftime("%Y-%m-%d-%H-%M")) + '.csv'
-    result1.to_csv(sub_file, index=False)
+    # Save the submission as a csv file of the proper format
+    result1.to_csv(sub_file, index=True, index_label='id')
 
 if __name__ == "__main__":
     # Just some informal testing stuff

@@ -13,12 +13,19 @@ model = Sequential()
 model.add(Dense(200, activation='relu', input_dim=Xtr.shape[1]))
 model.add(Dense(200, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
-### TODO Replace the above code here with a ConvNet architecture ###
 
 model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
 # Mess around with the number of epochs to make training better
 fit = model.fit(Xtr, ytr, nb_epoch=10, validation_split=.2)
 
+# Load the test dataset and flatten the images
+Xte = dogsvcats.load_test(grayscale=True)
+# TODO Comment the line below if passing to a convnet
+Xte = Xte.reshape(Xte.shape[0], -1)
+
+# Make predictions and create a submission
+predictions = model.predict_proba(Xte)
+dogsvcats.create_submission(predictions)
+
 # TODO (Abhijeet) add an early stopping callback
-# TODO (Abhijeet) add a create_submission function
