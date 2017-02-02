@@ -19,6 +19,9 @@ model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accurac
 # Mess around with the number of epochs to make training better
 fit = model.fit(Xtr, ytr, nb_epoch=10, validation_split=.2)
 
+# If you run into memory issues, uncommenting the line below might help
+# Xtr, ytr = None, None
+
 # Load the test dataset and flatten the images
 Xte = dogsvcats.load_test(grayscale=True)
 # TODO Comment the line below if passing to a convnet
