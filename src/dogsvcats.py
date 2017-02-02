@@ -1,7 +1,9 @@
 import os
 from PIL import Image
+import datetime
 
 import numpy as np
+import pandas as pd
 from keras.preprocessing.image import img_to_array
 
 
@@ -98,6 +100,15 @@ def load_test(test_dir='../input/test/', img_size=(64, 64), grayscale=False):
     img_fpaths = [os.path.join(test_dir, fname) for fname in os.listdir(test_dir)]
     return prep_data(img_fpaths, img_size=img_size, grayscale=grayscale) / 255.
 
+
+def create_submission(predictions, info=''):
+    ids = np.arange(1, predictions.shape[0]+1).reshape(1, -1)
+    morphed_preds = predictions.reshape(predictions.shape[0], -1)
+    pred_vals = np.hstack((ids, morphed_preds))
+    result1 = pd.DataFrame(pred_vals, columns=['id', 'label'])
+    now = datetime.datetime.now()
+    sub_file = 'submission_' + info + '_' + str(now.strftime("%Y-%m-%d-%H-%M")) + '.csv'
+    result1.to_csv(sub_file, index=False)
 
 if __name__ == "__main__":
     # Just some informal testing stuff
