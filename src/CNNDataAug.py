@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split
 from keras.preprocessing.image import ImageDataGenerator
 from keras.layers import Convolution2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
+from keras.layers import Dropout, Flatten, Dense
 from keras.models import Sequential
 from keras.callbacks import ModelCheckpoint
 
@@ -46,25 +46,20 @@ train_generator = datagen.flow(Xtr, ytr)
 # Create the CNN
 print("Creating the model")
 model = Sequential()
-model.add(Convolution2D(32, 3, 3, input_shape=(150, 150, 3)))
-model.add(Activation('relu'))
+model.add(Convolution2D(32, 3, 3, input_shape=(150, 150, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Convolution2D(32, 3, 3))
-model.add(Activation('relu'))
+model.add(Convolution2D(32, 3, 3, activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Convolution2D(64, 3, 3))
-model.add(Activation('relu'))
+model.add(Convolution2D(64, 3, 3, activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 # the model so far outputs 3D feature maps (height, width, features)
 model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
-model.add(Dense(64))
-model.add(Activation('relu'))
+model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(1))
-model.add(Activation('sigmoid'))
+model.add(Dense(1, activation='sigmoid'))
 
 model.compile(loss='binary_crossentropy',
               optimizer='rmsprop',
