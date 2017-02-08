@@ -7,16 +7,22 @@ from keras.callbacks import ModelCheckpoint
 
 import dogsvcats
 
+IMGSIZE = (150, 150)
+
 # Load the data and make sure its the right size
 # 16 GB RAM, no other programs running, can take full dataset, otherwise scale appropriately
-Xtr, ytr = dogsvcats.load_train_opt('../input/train/', (150, 150), grayscale=False, shuffle=True, load=.5)
-assert(Xtr.shape[1:] == (150, 150, 3))
-assert(Xtr.shape[0] == ytr.shape[0])
+Xtr, ytr = dogsvcats.load_train_opt('../input/train/', IMGSIZE, grayscale=False, shuffle=True, load=.2)
+assert(Xtr.shape[1:] == IMGSIZE + (3,))
 
 # Split into train and validation (Memory Efficient)
 split_ind = int(Xtr.shape[0] * .8)
 Xval, yval = Xtr[split_ind:], ytr[split_ind:]
 Xtr, ytr = Xtr[:split_ind], ytr[:split_ind]
+# print the stats of the data
+print("Training Data")
+dogsvcats.print_stats(Xtr, ytr, vis=False)
+print("Validation Data")
+dogsvcats.print_stats(Xval, yval, vis=False)
 
 # Split into train and validation
 # NOT MEMORY EFFICIENT
@@ -25,7 +31,7 @@ Xtr, ytr = Xtr[:split_ind], ytr[:split_ind]
 # Instantiate the image augmentor with the desired settings
 print("Instantiating the image augmentor")
 datagen = ImageDataGenerator(
-        rotation_range=40,
+        rotation_range=20.,
         width_shift_range=0.2,
         height_shift_range=0.2,
         shear_range=0.2,

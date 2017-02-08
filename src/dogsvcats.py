@@ -1,11 +1,14 @@
 import os
+import warnings
 from PIL import Image
 import datetime
 import random as rand
 
 import numpy as np
 import pandas as pd
-from keras.preprocessing.image import img_to_array, load_img
+
+import matplotlib.pyplot as plt
+from keras.preprocessing.image import img_to_array
 
 
 def read_image(file_path, img_size=None, grayscale=False):
@@ -66,6 +69,7 @@ def load_train(train_dir='../input/train/', img_size=(64, 64), grayscale=False, 
     :param shuffle: Whether or not to shuffle the dataset before returning
     :return: A tuple of the image 4d numpy array and a 1d array of binary labels
     """
+    warnings.warn("Use load_train_opt instead", DeprecationWarning)
     X_list = []
     y_list = []
     # For each class load the image data
@@ -104,6 +108,7 @@ def load_train_opt(train_dir='../input/train/', img_size=(64, 64), grayscale=Fal
         X[i] = img_to_array(read_image(img_fpath, img_size=img_size, grayscale=grayscale))
         y[i] = 1. if 'dog' in img_fpath else 0.
         if i % 1000 == 0: print('Processed {} of {}'.format(i, nsamples))
+    X /= 255.
     return X, y
 
 def load_test(test_dir='../input/test/', img_size=(64, 64), grayscale=False):
@@ -116,6 +121,39 @@ def load_test(test_dir='../input/test/', img_size=(64, 64), grayscale=False):
     """
     img_fpaths = [os.path.join(test_dir, fname) for fname in os.listdir(test_dir)]
     return prep_data(img_fpaths, img_size=img_size, grayscale=grayscale) / 255.
+
+
+def print_stats(X, y, vis=False):
+    """
+    A simple function that prints out properties of the
+    input cat dog dataset
+    :param X: An ndarray of cat dog training images
+    :param y: An array of labels to the corresponding images
+    :param vis: A boolean about whether to visualize or not
+
+    Prints the following metrics:
+    Number of images
+    Size of the Images
+    RGB or Grayscale
+    % of images that are DOGS and % that are CATS
+    """
+    assert (X.shape[0] == y.shape[0])
+    assert (np.max(y) == 1.)
+    assert (np.max(X) <= 1.)
+    assert (np.min(X) >= 0.)
+    print("Num Images: {}".format(X.shape[0]))
+    print("Image Size: {}".format(X.shape[1:3]))
+    print("RGB" if X.shape[3] == 3 else "Grayscale")
+    per_dog = float(y[y == 1.].shape[0]) / y.shape[0]
+    per_cat = float(y[y == 0.].shape[0]) / y.shape[0]
+    assert (round(per_cat + per_dog, 10) == 1.)
+    print("{}% DOG; {}% CAT".format(per_dog * 100., per_cat * 100.))
+    if vis:
+        print("Visualizing some images")
+        for x in X:
+            img = array_to_img(x)
+            plt.imshow(img)
+            plt.show()
 
 
 def create_submission(predictions, info=''):
