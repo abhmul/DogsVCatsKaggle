@@ -1,10 +1,11 @@
 import os
 from PIL import Image
 import datetime
+import random as rand
 
 import numpy as np
 import pandas as pd
-from keras.preprocessing.image import img_to_array
+from keras.preprocessing.image import img_to_array, load_img
 
 
 def read_image(file_path, img_size=None, grayscale=False):
@@ -31,7 +32,7 @@ def read_image(file_path, img_size=None, grayscale=False):
     return img
 
 
-def prep_data(images, img_size=(64, 64), grayscale=False):
+def prep_data(images, img_size=(64, 64), grayscale=False, data=None, start=0):
     """
     Prepares a list of image paths into a 4d numpy array
     :param images: an iterable of image paths
@@ -88,6 +89,22 @@ def load_train(train_dir='../input/train/', img_size=(64, 64), grayscale=False, 
         y = y[inds]
     return X, y
 
+
+def load_train_opt(train_dir='../input/train/', img_size=(64, 64), grayscale=False, shuffle=True, load=1.):
+
+    load = np.clip(load, 0., 1.)
+    img_fpaths = [os.path.join(train_dir, fname) for fname in os.listdir(train_dir)]
+    if shuffle:
+        rand.shuffle(img_fpaths)
+    nsamples = max(int(len(img_fpaths) * load), 1)
+    img_fpaths = img_fpaths[:nsamples]
+    X = np.empty((nsamples,) + img_size + (1 if grayscale else 3,))
+    y = np.zeros((nsamples,))
+    for i, img_fpath in enumerate(img_fpaths):
+        X[i] = img_to_array(read_image(img_fpath, img_size=img_size, grayscale=grayscale))
+        y[i] = 1. if 'dog' in img_fpath else 0.
+        if i % 1000 == 0: print('Processed {} of {}'.format(i, nsamples))
+    return X, y
 
 def load_test(test_dir='../input/test/', img_size=(64, 64), grayscale=False):
     """
